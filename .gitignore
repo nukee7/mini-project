@@ -1,0 +1,99 @@
+# =========================
+# Python bytecode
+# =========================
+pycache/
+*.py[cod]
+*$py.class
+
+# =========================
+# Virtual environments
+# =========================
+venv/
+.env/
+.envrc/
+.venv/
+venv311/
+env/
+
+# =========================
+# Build / distribution
+# =========================
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# =========================
+# Jupyter Notebook
+# =========================
+.ipynb_checkpoints/
+
+# =========================
+# Logs
+# =========================
+logs/
+*.log
+
+# =========================
+# Dataset files
+# =========================
+data/raw/
+data/interim/
+data/processed/
+*.csv
+*.xlsx
+*.parquet
+
+# If you want to keep specific dataset files,
+# remove the line above and ignore only large files:
+# *.csv
+
+# =========================
+# Model files
+# =========================
+models/
+*.pkl
+*.joblib
+*.h5
+*.pt
+*.pth
+.onnx
+
+# =========================
+# Temporary / cache
+# =========================
+.cache/
+tmp/
+temp/
+
+# =========================
+# macOS system files
+# =========================
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# =========================
+# IDE settings
+# =========================
+.vscode/
+.idea/
+
+# =========================
+# Python testing
+# =========================
+.pytest_cache/
+.coverage
+htmlcov/
+
+# =========================
+# Environment variables
+# =========================
+.env
+.env.
+
+# =========================
+# Misc
+# =========================
+*.swp
+*.swo

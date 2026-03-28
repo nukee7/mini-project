@@ -1,0 +1,25 @@
+# Core numerical and data processing
+numpy>=2.1
+pandas>=2.2
+scipy>=1.14
+
+# Machine Learning
+scikit-learn>=1.5
+joblib>=1.4
+
+# Visualization
+matplotlib>=3.9
+seaborn>=0.13
+
+# Federated Learning
+flwr>=1.9
+
+# Explainable AI
+shap>=0.46
+lime>=0.2.0.1
+
+# Fairness / Ethical AI
+fairlearn>=0.11
+
+# Utilities
+tqdm>=4.66
