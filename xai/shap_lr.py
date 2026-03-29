@@ -20,13 +20,13 @@ os.makedirs("explainability_outputs", exist_ok=True)
 
 model = joblib.load("models/logistic_regression.pkl")
 
-scaler = joblib.load("scaler.pkl")
+scaler = joblib.load("scaler/lr_scaler.pkl")
 
 # ==========================================================
 # Load Test Data
 # ==========================================================
 
-test_df = pd.read_csv("test_data.csv")
+test_df = pd.read_csv("data/test_data.csv")
 
 X_test = test_df.drop("target", axis=1)
 
