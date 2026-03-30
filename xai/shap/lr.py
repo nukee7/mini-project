@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 # Create output directory
 # ==========================================================
 
-os.makedirs("explainability_outputs", exist_ok=True)
+os.makedirs("explainability_outputs/lr", exist_ok=True)
 
 # ==========================================================
 # Load Model and Scaler
@@ -104,7 +104,7 @@ shap.plots.waterfall(
 )
 
 plt.savefig(
-    "explainability_outputs/shap_local_explanation.png",
+    "explainability_outputs/lr/lr_explanation.png",
     bbox_inches="tight"
 )
 

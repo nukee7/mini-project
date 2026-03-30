@@ -6,8 +6,8 @@ from sklearn.naive_bayes import GaussianNB
 
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
 
-train_df = pd.read_csv("train_data.csv")
-test_df = pd.read_csv("test_data.csv")
+train_df = pd.read_csv("data/train_data.csv")
+test_df = pd.read_csv("data/test_data.csv")
 
 X_train = train_df.drop("target", axis=1)
 y_train = train_df["target"]
@@ -37,4 +37,4 @@ print("F1 Score:", f1_score(y_test, y_pred))
 print("ROC-AUC:", roc_auc_score(y_test, y_prob))
 
 joblib.dump(model, "models/gaussian_nb.pkl")
-joblib.dump(scaler, "models/gaussian_scaler.pkl")
+joblib.dump(scaler, "scaler/gaussian_scaler.pkl")
