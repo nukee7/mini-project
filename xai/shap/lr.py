@@ -1,21 +1,22 @@
 # ==========================================================
-# SHAP EXPLAINABILITY FOR LOGISTIC REGRESSION
+# SHAP FOR LOGISTIC REGRESSION — PNG + CSV OUTPUTS
 # ==========================================================
 
 import os
 import pandas as pd
 import joblib
 import shap
+import numpy as np
 import matplotlib.pyplot as plt
 
 # ==========================================================
-# Create output directory
-# ==========================================================
 
-os.makedirs("explainability_outputs/lr", exist_ok=True)
+output_dir = "explainability_outputs/lr"
+
+os.makedirs(output_dir, exist_ok=True)
 
 # ==========================================================
-# Load Model and Scaler
+# Load model and scaler
 # ==========================================================
 
 model = joblib.load("models/logistic_regression.pkl")
@@ -23,91 +24,124 @@ model = joblib.load("models/logistic_regression.pkl")
 scaler = joblib.load("scaler/lr_scaler.pkl")
 
 # ==========================================================
-# Load Test Data
+# Load data
 # ==========================================================
 
 test_df = pd.read_csv("data/test_data.csv")
 
 X_test = test_df.drop("target", axis=1)
 
-y_test = test_df["target"]
-
-# ==========================================================
-# Scale Data
-# ==========================================================
-
 X_test_scaled = scaler.transform(X_test)
 
 # ==========================================================
-# Create SHAP Explainer
+# SHAP
 # ==========================================================
 
 explainer = shap.Explainer(
+
     model,
     X_test_scaled
 )
 
 shap_values = explainer(
+
     X_test_scaled
 )
 
 print("SHAP values calculated")
 
 # ==========================================================
-# 1) Global Explanation — Summary Plot
+# Convert SHAP to array
+# ==========================================================
+
+shap_array = shap_values.values
+
+# ==========================================================
+# SAVE SHAP VALUES CSV
+# ==========================================================
+
+shap_df = pd.DataFrame(
+
+    shap_array,
+    columns=X_test.columns
+)
+
+shap_df.to_csv(
+
+    f"{output_dir}/lr_shap_values.csv",
+    index=False
+)
+
+print("Saved: lr_shap_values.csv")
+
+# ==========================================================
+# SAVE FEATURE IMPORTANCE CSV
+# ==========================================================
+
+importance = np.abs(shap_array).mean(axis=0)
+
+importance_df = pd.DataFrame({
+
+    "Feature": X_test.columns,
+    "Mean_SHAP_Importance": importance
+
+}).sort_values(
+
+    by="Mean_SHAP_Importance",
+    ascending=False
+)
+
+importance_df.to_csv(
+
+    f"{output_dir}/lr_feature_importance.csv",
+    index=False
+)
+
+print("Saved: feature_importance.csv")
+
+# ==========================================================
+# SUMMARY PLOT
 # ==========================================================
 
 plt.figure()
 
 shap.summary_plot(
-    shap_values,
+
+    shap_array,
     X_test,
     show=False
 )
 
 plt.savefig(
-    "explainability_outputs/shap_summary_plot.png",
+
+    f"{output_dir}/shap_summary.png",
     bbox_inches="tight"
 )
 
-print("Saved: shap_summary_plot.png")
+plt.close()
 
 # ==========================================================
-# 2) Global Explanation — Bar Plot
+# BAR PLOT
 # ==========================================================
 
 plt.figure()
 
-shap.plots.bar(
-    shap_values,
+shap.summary_plot(
+
+    shap_array,
+    X_test,
+    plot_type="bar",
     show=False
 )
 
 plt.savefig(
-    "explainability_outputs/shap_bar_plot.png",
+
+    f"{output_dir}/shap_bar.png",
     bbox_inches="tight"
 )
 
-print("Saved: shap_bar_plot.png")
+plt.close()
 
-# ==========================================================
-# 3) Local Explanation — Single Prediction
-# ==========================================================
+print("PNG plots saved")
 
-index = 0
-
-plt.figure()
-
-shap.plots.waterfall(
-    shap_values[index],
-    show=False
-)
-
-plt.savefig(
-    "explainability_outputs/lr/lr_explanation.png",
-    bbox_inches="tight"
-)
-
-print("Saved: shap_local_explanation.png")
-
-print("\nExplainability pipeline completed")
+print("\nLogistic Regression SHAP completed")

@@ -1,5 +1,5 @@
 # ==========================================================
-# SHAP FOR GAUSSIAN NAIVE BAYES (ROBUST VERSION)
+# SHAP FOR GAUSSIAN NAIVE BAYES — FULL VERSION
 # ==========================================================
 
 import os
@@ -10,7 +10,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # ==========================================================
-# Create output directory
+# Output directory
 # ==========================================================
 
 output_dir = "explainability_outputs/gaussian_nb"
@@ -42,7 +42,7 @@ feature_names = X_test.columns
 X_test_scaled = scaler.transform(X_test)
 
 # ==========================================================
-# Background data (for KernelExplainer)
+# Background data for KernelExplainer
 # ==========================================================
 
 background = X_test_scaled[:100]
@@ -59,9 +59,7 @@ explainer = shap.KernelExplainer(
 
 print("Computing SHAP values...")
 
-# ==========================================================
-# Compute SHAP values
-# ==========================================================
+# Use subset for performance
 
 shap_values = explainer.shap_values(
 
@@ -69,7 +67,7 @@ shap_values = explainer.shap_values(
 )
 
 # ==========================================================
-# Normalize SHAP output shape
+# Normalize SHAP output
 # ==========================================================
 
 if isinstance(shap_values, list):
@@ -85,7 +83,7 @@ else:
         shap_array = shap_array[:, :, 1]
 
 # ==========================================================
-# Diagnostic check (optional)
+# Diagnostic check
 # ==========================================================
 
 print("SHAP shape:", shap_array.shape)
@@ -93,7 +91,50 @@ print("SHAP shape:", shap_array.shape)
 print("Data shape:", X_test.iloc[:100].shape)
 
 # ==========================================================
-# Summary plot (global explanation)
+# SAVE SHAP VALUES CSV
+# ==========================================================
+
+shap_df = pd.DataFrame(
+
+    shap_array,
+    columns=feature_names
+)
+
+shap_df.to_csv(
+
+    f"{output_dir}/shap_values.csv",
+    index=False
+)
+
+print("Saved: shap_values.csv")
+
+# ==========================================================
+# SAVE FEATURE IMPORTANCE CSV
+# ==========================================================
+
+importance = np.abs(shap_array).mean(axis=0)
+
+importance_df = pd.DataFrame({
+
+    "Feature": feature_names,
+    "Mean_SHAP_Importance": importance
+
+}).sort_values(
+
+    by="Mean_SHAP_Importance",
+    ascending=False
+)
+
+importance_df.to_csv(
+
+    f"{output_dir}/feature_importance.csv",
+    index=False
+)
+
+print("Saved: feature_importance.csv")
+
+# ==========================================================
+# SUMMARY PLOT
 # ==========================================================
 
 plt.figure()
@@ -102,14 +143,12 @@ shap.summary_plot(
 
     shap_array,
     X_test.iloc[:100],
-
     show=False
 )
 
 plt.savefig(
 
     f"{output_dir}/shap_summary.png",
-
     bbox_inches="tight"
 )
 
@@ -118,7 +157,7 @@ plt.close()
 print("Saved: shap_summary.png")
 
 # ==========================================================
-# Bar plot (feature importance ranking)
+# BAR PLOT
 # ==========================================================
 
 plt.figure()
@@ -127,16 +166,13 @@ shap.summary_plot(
 
     shap_array,
     X_test.iloc[:100],
-
     plot_type="bar",
-
     show=False
 )
 
 plt.savefig(
 
     f"{output_dir}/shap_bar.png",
-
     bbox_inches="tight"
 )
 
