@@ -14,7 +14,7 @@ from lime.lime_tabular import LimeTabularExplainer
 # Configuration
 # ==========================================================
 
-MODEL_NAME = "logistic_regression"
+MODEL_NAME = "random_forest"
 
 MODEL_PATH = f"models/{MODEL_NAME}.pkl"
 

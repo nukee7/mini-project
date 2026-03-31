@@ -1,36 +1,56 @@
 # ==========================================================
-# LIME EXPLAINABILITY — SAVE PNG ONLY
+# LIME EXPLAINABILITY FOR PYTORCH DNN — PNG + CSV
 # ==========================================================
 
 import os
 import pandas as pd
 import numpy as np
-import joblib
+import torch
+import torch.nn as nn
 import matplotlib.pyplot as plt
 
+from sklearn.preprocessing import StandardScaler
 from lime.lime_tabular import LimeTabularExplainer
 
 # ==========================================================
 # Configuration
 # ==========================================================
 
-MODEL_NAME = "logistic_regression"
+MODEL_NAME = "dnn_model"
 
-MODEL_PATH = f"models/{MODEL_NAME}.pkl"
+MODEL_PATH = f"models/{MODEL_NAME}.pth"
 
 DATA_PATH = "data/test_data.csv"
-
-# Required directory structure
 
 output_dir = f"lime_explainiblity_output/{MODEL_NAME}"
 
 os.makedirs(output_dir, exist_ok=True)
 
 # ==========================================================
-# Load model
+# Define model architecture (must match training)
 # ==========================================================
 
-model = joblib.load(MODEL_PATH)
+class DNNModel(nn.Module):
+
+    def __init__(self, input_size):
+
+        super(DNNModel, self).__init__()
+
+        self.network = nn.Sequential(
+
+            nn.Linear(input_size, 64),
+            nn.ReLU(),
+
+            nn.Linear(64, 32),
+            nn.ReLU(),
+
+            nn.Linear(32, 1),
+            nn.Sigmoid()
+        )
+
+    def forward(self, x):
+
+        return self.network(x)
 
 # ==========================================================
 # Load data
@@ -45,12 +65,65 @@ y_test = test_df["target"]
 feature_names = list(X_test.columns)
 
 # ==========================================================
+# Scaling (same as your training)
+# ==========================================================
+
+scaler = StandardScaler()
+
+X_test_scaled = scaler.fit_transform(X_test)
+
+# ==========================================================
+# Load PyTorch model
+# ==========================================================
+
+input_size = X_test.shape[1]
+
+model = DNNModel(input_size)
+
+model.load_state_dict(
+
+    torch.load(
+        MODEL_PATH,
+        map_location=torch.device("cpu")
+    )
+)
+
+model.eval()
+
+print("Model loaded successfully")
+
+# ==========================================================
+# Prediction function for LIME
+# ==========================================================
+
+def predict_fn(data):
+
+    tensor_data = torch.tensor(
+
+        data,
+        dtype=torch.float32
+    )
+
+    with torch.no_grad():
+
+        outputs = model(tensor_data)
+
+    probabilities = outputs.numpy()
+
+    return np.hstack([
+
+        1 - probabilities,
+        probabilities
+
+    ])
+
+# ==========================================================
 # Create LIME explainer
 # ==========================================================
 
 explainer = LimeTabularExplainer(
 
-    training_data=X_test.values,
+    training_data=X_test_scaled,
 
     feature_names=feature_names,
 
@@ -60,12 +133,12 @@ explainer = LimeTabularExplainer(
 )
 
 # ==========================================================
-# Select instance to explain
+# Select instance
 # ==========================================================
 
 index = 0
 
-instance = X_test.iloc[index].values
+instance = X_test_scaled[index]
 
 # ==========================================================
 # Generate explanation
@@ -75,7 +148,7 @@ explanation = explainer.explain_instance(
 
     data_row=instance,
 
-    predict_fn=model.predict_proba,
+    predict_fn=predict_fn,
 
     num_features=len(feature_names)
 )
@@ -126,4 +199,4 @@ importance_df.to_csv(
 
 print("Saved:", csv_path)
 
-print("\nLIME PNG pipeline completed successfully")
+print("\nLIME pipeline completed successfully")

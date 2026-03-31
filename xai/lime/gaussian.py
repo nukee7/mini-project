@@ -14,7 +14,7 @@ from lime.lime_tabular import LimeTabularExplainer
 # Configuration
 # ==========================================================
 
-MODEL_NAME = "logistic_regression"
+MODEL_NAME = "gaussian_nb"
 
 MODEL_PATH = f"models/{MODEL_NAME}.pkl"
 
