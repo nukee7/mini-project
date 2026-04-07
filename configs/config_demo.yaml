@@ -1,0 +1,27 @@
+# config_demo.yaml
+# Plug-and-Play Demo Configuration for VS Code/Colab Simulator
+
+demo_mode:
+  description: "Fast, visible simulation of the 4 geographic nodes."
+  
+flwr_simulation:
+  num_rounds: 3
+  fraction_fit: 1.0
+  fraction_evaluate: 1.0
+  min_fit_clients: 4
+  min_evaluate_clients: 4
+
+fedprox_strategy:
+  proximal_mu: 0.8  # Restricts statistical heterogeneity (Non-IID handling)
+
+privacy_engine:
+  target_epsilon: 3.0
+  target_delta: 0.00001
+  max_grad_norm: 1.2
+  local_epochs: 1
+
+federated_nodes:
+  - "Cleveland"
+  - "Hungary"
+  - "Switzerland" 
+  - "Long_Beach_VA"

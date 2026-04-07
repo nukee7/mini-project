@@ -37,9 +37,7 @@ logs/
 # =========================
 # Dataset files
 # =========================
-data/raw/
-data/interim/
-data/processed/
+data/
 *.csv
 *.xlsx
 *.parquet
